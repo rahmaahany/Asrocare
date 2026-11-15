@@ -1,0 +1,37 @@
+{
+  "resting_hr": {
+    "green": "Optimal: Cardiovascular conditioning and resting heart rate are stable. Action: Continue routine mission tasks.",
+    "yellow": "Warning: Elevated resting heart rate indicating cardiovascular strain or fatigue. Action: Pause current tasks, hydrate, and rest for 15 minutes.",
+    "red": "Critical: Persistent tachycardia or cardiac strain! Action: Lie down immediately, monitor telemetry, and alert Mission Control."
+  },
+  "blood_oxygen_spo2": {
+    "green": "Optimal: SpO2 levels optimal. Action: Maintain routine station operations.",
+    "yellow": "Warning: Mild hypoxia indicator or cabin ventilation drop. Action: Check local module air flow and practice paced deep breathing.",
+    "red": "Critical: Hypoxia risk! Action: Put on supplemental oxygen mask immediately and check suit/module pressure integrity."
+  },
+  "exercise_compliance": {
+    "green": "Optimal: Full adherence to physical countermeasures schedule. Action: Keep up the excellent routine.",
+    "yellow": "Warning: Falling behind on prescribed daily workout minutes. Action: Re-schedule missed training blocks into today's timeline.",
+    "red": "Critical: Severe non-compliance with physical countermeasures! Action: Immediate mandatory physical conditioning session required."
+  },
+  "body_temp": {
+    "green": "Optimal: Core body temperature is normal. Action: Maintain standard operations.",
+    "yellow": "Warning: Mild elevation in body temperature. Action: Increase fluid intake, rest, and monitor temperature trend over the next 2 hours.",
+    "red": "Critical: High fever or acute inflammatory/infection sign! Action: Isolate in quarters, take prescribed antipyretics if cleared, and contact Flight Surgeon immediately."
+  },
+  "sleep_hours": {
+    "green": "Optimal: Sleep hygiene and duration are adequate. Action: Maintain normal circadian alignment.",
+    "yellow": "Warning: Sleep restriction detected (<6 hours). Action: Review pre-sleep lighting protocols and protect the 8-hour sleep window.",
+    "red": "Critical: Severe sleep deprivation affecting cognitive performance! Action: Take an immediate nap period and suspend critical operational decisions."
+  },
+  "mental_health": {
+    "green": "Optimal: Behavioral health and mood are stable. Action: Maintain regular crew interactions.",
+    "yellow": "Warning: Isolation fatigue or declining mood score. Action: Schedule a private communication session with family.",
+    "red": "Critical: Severe psychological distress! Action: Speak with the crew commander or ground psychological team immediately."
+  },
+  "dose_cum": {
+    "green": "Optimal: Cumulative radiation dose is well within NASA limits. Action: Continue routine operations and wear your dosimeter.",
+    "yellow": "Warning: Cumulative radiation dose is approaching the limit. Action: Spend more time in the best-shielded area of the habitat and limit unnecessary exposure.",
+    "red": "Critical: High cumulative dose or a solar particle event detected! Action: Move immediately to the storm shelter / best-shielded area and contact Mission Control."
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "resting_hr": {
+    "dir": "high",
+    "normal": "< 80",
+    "warn": 85,
+    "danger": 100
+  },
+  "blood_oxygen_spo2": {
+    "dir": "low",
+    "normal": ">= 98",
+    "warn": 95,
+    "danger": 90
+  },
+  "exercise_compliance": {
+    "dir": "low",
+    "normal": ">= 90",
+    "warn": 75,
+    "danger": 60
+  },
+  "body_temp": {
+    "dir": "high",
+    "normal": "< 37.2",
+    "warn": 37.5,
+    "danger": 38.3
+  },
+  "sleep_hours": {
+    "dir": "low",
+    "normal": ">= 7.5",
+    "warn": 6.0,
+    "danger": 4.5
+  },
+  "mental_health": {
+    "dir": "low",
+    "normal": ">= 4",
+    "warn": 3,
+    "danger": 2
+  },
+  "dose_cum": {
+    "dir": "high",
+    "normal": "< 100",
+    "warn": 150,
+    "danger": 240
+  }
+}

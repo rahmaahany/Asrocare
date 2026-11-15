@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>AstroCare — Space Health Monitoring System</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- shown until data/thresholds.json + data/advice.json are loaded -->
+<div class="loader" id="loader">
+  <div class="loader-box">
+    <img src="assets/logo.png" alt="AstroCare">
+    <div class="spin" id="ld-spin"></div>
+    <p id="ld-msg">Loading mission data…</p>
+    <div id="ld-pick" hidden>
+      <p>The browser blocked reading the data files directly (page opened as a local file).<br>
+        Select <code>thresholds.json</code> and <code>advice.json</code> from the <code>data</code> folder:</p>
+      <p style="margin-top:14px"><label class="btn">Choose data files<input type="file" id="ld-file" accept=".json,application/json" multiple hidden></label></p>
+    </div>
+  </div>
+</div>
+
+<header class="top">
+  <a class="brand" href="#dashboard" aria-label="AstroCare, Space Health Monitoring System">
+    <img class="logo" src="assets/logo.png" alt="AstroCare, Space Health Monitoring System">
+  </a>
+  <div class="top-r">
+    <span class="live"><span class="dot" aria-hidden="true"></span>Live telemetry (simulated)</span>
+    <span class="src" id="src">Data: <b>thresholds.json</b> · <b>advice.json</b></span>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="side">
+    <nav class="nav" aria-label="Main">
+      <a href="#dashboard" data-nav="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="9" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="5" rx="1.5"/><rect x="13.5" y="11" width="7.5" height="10" rx="1.5"/><rect x="3" y="15" width="7.5" height="6" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a href="#body" data-nav="body">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="2.5"/><path d="M6 21l1.5-8L6 9.5c3.5-1.5 8.5-1.5 12 0L16.5 13 18 21M12 12v9"/></svg>
+        Body
+      </a>
+      <a href="#checkin" data-nav="checkin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M9 13l2 2 4-4"/></svg>
+        Check-in
+      </a>
+      <a href="#charts" data-nav="charts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        Charts
+      </a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="modebar" id="modebar" hidden>
+      <span id="modetxt"></span>
+      <button type="button" class="btn ghost" id="resume">Resume live simulation</button>
+    </div>
+    <!-- ============ DASHBOARD ============ -->
+    <section id="page-dashboard" class="page" aria-labelledby="h-dash">
+      <div class="ph"><h1 id="h-dash">Crew health overview</h1><p>All seven monitored indicators at a glance. Click any card for details.</p></div>
+      <div class="dash">
+        <div class="frame">
+          <div class="scene" aria-hidden="true">
+            <canvas id="stars"></canvas>
+            <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="glow" cx="78%" cy="18%" r="55%"><stop offset="0" stop-opacity="0.22" style="stop-color:var(--cyan)"/><stop offset="1" stop-opacity="0" style="stop-color:var(--cyan)"/></radialGradient>
+                <radialGradient id="vig" cx="50%" cy="50%" r="75%"><stop offset="0.55" stop-opacity="0" style="stop-color:var(--ill-black)"/><stop offset="1" stop-opacity="0.7" style="stop-color:var(--ill-black)"/></radialGradient>
+                <linearGradient id="hull" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--ill-hull-light)"/><stop offset="1" style="stop-color:var(--ill-hull-dark)"/></linearGradient>
+                <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--ill-panel-light)"/><stop offset="1" style="stop-color:var(--ill-panel-dark)"/></linearGradient>
+                <linearGradient id="suitFront" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--ill-suit-1)"/><stop offset="1" style="stop-color:var(--ill-suit-2)"/></linearGradient>
+                <radialGradient id="visor" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:var(--ill-visor-1)"/><stop offset="0.45" style="stop-color:var(--ill-visor-2)"/><stop offset="1" style="stop-color:var(--ill-visor-3)"/></radialGradient>
+                <pattern id="cells" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M26 0H0V26" fill="none" stroke-opacity="0.35" stroke-width="1.2" style="stroke:var(--star-tint)"/></pattern>
+                <pattern id="tiles" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M34 0H0V34" fill="none" stroke-opacity="0.18" stroke-width="1.5" style="stroke:var(--ill-black)"/></pattern>
+                <g id="astro">
+                  <rect x="-42" y="-60" width="84" height="108" rx="18" style="fill:var(--ill-suit-3)"/>
+                  <g stroke-linecap="round" fill="none">
+                    <path d="M-14 72 L-34 160" stroke-width="32" style="stroke:var(--ill-suit-4)"/>
+                    <path d="M16 72 L40 154" stroke-width="32" style="stroke:var(--ill-suit-5)"/>
+                    <path d="M-30 -22 L-96 -66" stroke-width="28" style="stroke:var(--ill-suit-6)"/>
+                    <path d="M32 -22 L92 24" stroke-width="28" style="stroke:var(--ill-suit-7)"/>
+                  </g>
+                  <circle cx="-98" cy="-67" r="15" style="fill:var(--ill-suit-8)"/>
+                  <circle cx="94" cy="26" r="15" style="fill:var(--ill-suit-9)"/>
+                  <ellipse cx="-34" cy="162" rx="19" ry="10" style="fill:var(--ill-suit-10)"/>
+                  <ellipse cx="42" cy="156" rx="19" ry="10" style="fill:var(--ill-suit-8)"/>
+                  <rect x="-36" y="-44" width="72" height="118" rx="26" fill="url(#suitFront)"/>
+                  <rect x="-17" y="-8" width="34" height="24" rx="5" opacity="0.75" style="fill:var(--ill-suit-pack)"/>
+                  <circle cx="0" cy="-66" r="33" style="fill:var(--ill-helmet)"/>
+                  <ellipse cx="3" cy="-66" rx="23" ry="21" fill="url(#visor)"/>
+                  <ellipse cx="-4" cy="-74" rx="7" ry="4" opacity="0.45" style="fill:var(--white)"/>
+                </g>
+              </defs>
+              <rect width="1600" height="900" fill="url(#glow)"/>
+              <path d="M0 400 C190 350 380 430 430 570 C470 690 360 790 200 850 L0 900 Z" fill="url(#hull)"/>
+              <path d="M0 400 C190 350 380 430 430 570 C470 690 360 790 200 850 L0 900 Z" fill="url(#tiles)"/>
+              <path d="M60 640 C180 600 330 650 350 740 C300 800 180 840 60 870 Z" opacity="0.55" style="fill:var(--ill-hull-shadow)"/>
+              <path d="M120 690 C220 660 300 690 320 740" fill="none" stroke-width="5" stroke-opacity="0.6" style="stroke:var(--ill-hull-trim)"/>
+              <g stroke-width="3" style="stroke:var(--ill-panel-frame)">
+                <polygon points="380,770 700,640 745,725 425,840" fill="url(#panel)"/>
+                <polygon points="380,770 700,640 745,725 425,840" fill="url(#cells)" stroke="none"/>
+                <polygon points="700,640 1040,590 1092,672 745,725" fill="url(#panel)"/>
+                <polygon points="700,640 1040,590 1092,672 745,725" fill="url(#cells)" stroke="none"/>
+                <polygon points="1040,590 1330,505 1400,575 1092,672" fill="url(#panel)"/>
+                <polygon points="1040,590 1330,505 1400,575 1092,672" fill="url(#cells)" stroke="none"/>
+              </g>
+              <path d="M700 340 C820 470 610 560 520 650" fill="none" stroke-width="4" stroke-linecap="round" style="stroke:var(--ill-tether)"/>
+              <use href="#astro" transform="translate(640 330) rotate(-18) scale(1.05)"/>
+              <use href="#astro" transform="translate(1100 400) rotate(28) scale(1.15)"/>
+              <rect width="1600" height="900" fill="url(#vig)"/>
+            </svg>
+          </div>
+
+          <div class="hud">
+            <section class="p card hr" tabindex="0" data-link="resting_hr" aria-label="Heart rate">
+              <div class="lbl"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 5 6.4 5c2 0 3.6 1.1 5.6 3 2-1.9 3.6-3 5.6-3 3.4 0 5.5 3.4 4 6.8C19.5 16.4 12 21 12 21z"/></svg>Heart Rate<span class="st" data-hud-st></span></div>
+              <div class="val"><span id="hr">72</span><small>bpm</small></div>
+              <div class="x-only" data-det></div>
+            </section>
+            <section class="p card ecg-p" tabindex="0" aria-label="Heart rhythm trace"><canvas id="ecg"></canvas></section>
+            <section class="p card o2" tabindex="0" data-link="blood_oxygen_spo2" aria-label="Body oxygen">
+              <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><circle cx="12" cy="12" r="8"/></svg>Body Oxygen<span class="st" data-hud-st></span></div>
+              <div class="val"><span id="o2">98</span><small>%</small></div>
+              <div class="x-only" data-det></div>
+            </section>
+            <section class="p card tc" tabindex="0" data-link="body_temp" aria-label="Body temperature">
+              <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4 4 0 1 0 4 0z"/></svg>Temperature<span class="st" data-hud-st></span></div>
+              <div class="val"><span id="tc">37.0</span><small>°C</small></div>
+              <div class="x-only" data-det></div>
+            </section>
+            <section class="p card rad" tabindex="0" data-link="dose_cum" aria-label="Radiation dose">
+              <div class="lbl">Radiation dose<span class="st" data-hud-st></span></div>
+              <div class="val"><span id="dose">0</span><small>mSv</small></div>
+              <div class="x-only" data-det></div>
+            </section>
+            <section class="p card slp" tabindex="0" data-link="sleep_hours" aria-label="Sleep">
+              <div class="lbl">Sleep<span class="st" data-hud-st></span></div>
+              <div class="val"><span id="slp">7</span><small>h</small></div>
+              <div class="x-only" data-det></div>
+            </section>
+            <section class="p card mood" tabindex="0" data-link="mental_health" aria-label="Mood">
+              <div class="lbl">Mood<span class="st" data-hud-st></span></div>
+              <div class="val"><span id="mood">4</span><small>/5</small></div>
+              <div class="x-only" data-det></div>
+            </section>
+            <section class="p card exr" tabindex="0" data-link="exercise_compliance" aria-label="Exercise">
+              <div class="lbl">Exercise<span class="st" data-hud-st></span></div>
+              <div class="val"><span id="exr">90</span><small>%</small></div>
+              <div class="x-only" data-det></div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="sec-t">Health advisories</h2>
+      <div class="advgrid" id="advgrid"></div>
+      <p class="note">Status levels and advice come from <code>data/thresholds.json</code> and <code>data/advice.json</code>. Readings are simulated. Click any card to enlarge it, click again to shrink it.</p>
+    </section>
+
+    <!-- ============ BODY ============ -->
+    <section id="page-body" class="page" aria-labelledby="h-body" hidden>
+      <div class="ph"><h1 id="h-body">Body scan</h1><p>Drag to rotate the 3D model. Hover or click a system to see its live reading.</p></div>
+      <div class="bodyview">
+        <div class="stage" id="stage">
+          <div class="col" id="colL"></div>
+          <div class="fig3d" id="fig3d">
+            <div class="fig-hud">
+              <i class="fig-corner tl"></i><i class="fig-corner tr"></i><i class="fig-corner bl"></i><i class="fig-corner br"></i>
+              <div class="fig-title">Holo scan · 3D<span id="fig-sel">All systems</span></div>
+              <div class="fig-read" id="fig-read"></div>
+              <div class="fig-tools">
+                <button type="button" id="b3-rot" aria-pressed="true" title="Auto-rotate" aria-label="Auto-rotate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
+                <button type="button" id="b3-reset" title="Reset view" aria-label="Reset view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
+              </div>
+            </div>
+            <div class="hs-layer" id="hs-layer"></div>
+            <svg class="tag-lines" id="tag-lines" aria-hidden="true"></svg>
+            <div class="tag-layer" id="tag-layer"></div>
+          </div>
+          <div class="col" id="colR"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CHECK-IN ============ -->
+    <section id="page-checkin" class="page" aria-labelledby="h-checkin" hidden>
+      <div class="ph"><h1 id="h-checkin">Daily check-in</h1><p>Log today's readings. The radiation dose is recorded automatically by the dosimeter (simulated).</p></div>
+      <div class="ci">
+        <form id="ci-form" class="ci-box" novalidate>
+          <div class="ci-grid">
+            <label>Mission scenario
+              <select id="ci-scenario">
+                <option value="healthy">Healthy</option>
+                <option value="decline" selected>Gradual decline</option>
+                <option value="crisis">Crisis (solar event)</option>
+              </select>
+            </label>
+            <label>Mission day (1–180)<input id="ci-day" type="number" min="1" max="180" step="1" value="150"></label>
+            <label>Sleep (hours)<input name="sleep_hours" type="number" min="0" max="24" step="any" required></label>
+            <label>Exercise compliance (%)<input name="exercise_compliance" type="number" min="0" max="100" step="1" required></label>
+            <label>Mood / mental health (1–5)<input name="mental_health" type="number" min="1" max="5" step="1" required></label>
+            <label>Body temperature (°C)<input name="body_temp" type="number" min="30" max="45" step="any" required></label>
+            <label>Resting heart rate (bpm)<input name="resting_hr" type="number" min="20" max="250" step="1" required></label>
+            <label>Blood oxygen SpO₂ (%)<input name="blood_oxygen_spo2" type="number" min="50" max="100" step="any" required></label>
+            <label class="full">Cumulative radiation dose (mSv) · recorded automatically<input id="ci-dose" name="dose_cum" type="number" min="0" max="5000" readonly tabindex="-1"></label>
+          </div>
+          <p class="ci-hint" id="ci-hint">Fields are pre-filled from the scenario data. Edit them freely.</p>
+          <p class="ci-hint err" id="ci-err" hidden></p>
+          <div class="ci-actions"><button type="submit" class="btn">Evaluate my status</button></div>
+        </form>
+        <div class="ci-box" id="ci-result" hidden aria-live="polite"></div>
+      </div>
+      <p class="note">Status levels and advice come from <code>data/thresholds.json</code> and <code>data/advice.json</code>. Decision-support tool, not a medical diagnosis.</p>
+    </section>
+
+    <!-- ============ CHARTS ============ -->
+    <section id="page-charts" class="page" aria-labelledby="h-charts" hidden>
+      <div class="ph"><h1 id="h-charts">Body charts</h1><p>Every monitored system, with its normal, warning and danger zones.</p></div>
+      <div class="tools">
+        <span id="rangelbl">Time window</span>
+        <div class="seg" role="group" aria-label="Time window">
+          <button type="button" data-range="1h" aria-pressed="false">1 h</button>
+          <button type="button" data-range="6h" aria-pressed="false">6 h</button>
+          <button type="button" data-range="24h" aria-pressed="true">24 h</button>
+        </div>
+      </div>
+      <div class="over">
+        <div class="box card ring-box" tabindex="0">
+          <div class="ring-wrap">
+            <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="trk" cx="50" cy="50" r="42"/><circle class="prg" id="ringp" cx="50" cy="50" r="42" stroke-dasharray="264 264"/></svg>
+            <div class="ring-num"><div><span id="ringn">0</span>/<span id="ringt">0</span><small>in range</small></div></div>
+          </div>
+          <p class="ring-cap" id="ringcap"></p>
+          <div class="x-only det" id="ring-det"></div>
+        </div>
+        <div class="box card" tabindex="0">
+          <h2>Where each system sits</h2>
+          <div id="bullets"></div>
+        </div>
+      </div>
+      <div class="cgrid" id="cgrid"></div>
+      <p class="note">Green = normal, amber = warning, red = danger (from <code>thresholds.json</code>). All readings are simulated.</p>
+    </section>
+  </main>
+</div>
+
+<script src="data/scenarios.js"></script>
+<script src="js/vendor/three.min.js"></script>
+<script src="js/body3d.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
